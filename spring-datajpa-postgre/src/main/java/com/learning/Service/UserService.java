@@ -1,13 +1,10 @@
 package com.learning.Service;
 
-import com.learning.Aggregator.AddressAggregator;
 import com.learning.Aggregator.UserAggregator;
 import com.learning.DTO.AddressDTO;
 import com.learning.DTO.DTOInterface;
 import com.learning.DTO.UserDTO;
-import com.learning.Entity.Address;
 import com.learning.Entity.User;
-import com.learning.Repository.AddressRepository;
 import com.learning.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,12 +21,11 @@ import java.util.Optional;
 public class UserService implements CrudService {
 
     private final UserRepository userRepository;
-    private final AddressRepository addressRepository;
-    private final AddressAggregator addressAggregator;
     private final UserAggregator userAggregator;
     private final AddressService addressService;
 
     @Override
+    @Transactional
     public DTOInterface update(DTOInterface dtoInterface) {
         try {
             UserDTO userDTO = (UserDTO) dtoInterface;
@@ -61,15 +56,10 @@ public class UserService implements CrudService {
 
             List<AddressDTO> addressDTOList = new ArrayList<>();
             userDTO.getAddress().forEach(item -> {
-                Address address = new Address();
-                address.setAddress(item.getAddress());
-                address.setStatus(item.isStatus());
-                address.setType(item.getType());
-                address.setUser(user);
-                addressRepository.save(address);
-                addressDTOList.add(addressAggregator.prepareDTOByEntity(address));
-            });
-
+                    item.setUserId(user.getId());
+                    addressDTOList.add((AddressDTO)addressService.create(item));
+                }
+            );
             userDTO.setId(user.getId());
             userDTO.setAddress(addressDTOList);
 

@@ -13,6 +13,7 @@ public class AddressAggregator {
         AddressDTO.setAddress(address.getAddress());
         AddressDTO.setType(address.getType());
         AddressDTO.setStatus(address.isStatus());
+        AddressDTO.setUserId(address.getUser().getId());
 
         return AddressDTO;
     }
