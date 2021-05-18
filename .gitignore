@@ -2,3 +2,6 @@
 /spring-datajpa-postgre/target/
 /spring-elasticsearch/target/
 /spring-mongo-rest/target/
+/spring-rabbitmq/target/
+.idea
+/.idea
