@@ -11,7 +11,7 @@
 
     <artifactId>spring-elasticsearch</artifactId>
     <groupId>com.learning</groupId>
-    <name>Rest Api</name>
+    <name>Elasticsearch Rest Api</name>
     <description>Elasticsearch Rest Api With Spring Boot</description>
     <version>1.0-SNAPSHOT</version>
 

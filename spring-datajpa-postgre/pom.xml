@@ -11,7 +11,7 @@
 
     <artifactId>spring-datajpa-postgre</artifactId>
     <groupId>com.learning</groupId>
-    <name>Rest Api</name>
+    <name>PostgreSQL Rest Api</name>
     <description>PostgreSQL Rest Api With Spring Boot</description>
     <version>1.0-SNAPSHOT</version>
 

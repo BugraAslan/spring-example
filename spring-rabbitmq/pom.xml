@@ -13,7 +13,7 @@
     <groupId>com.learning</groupId>
     <artifactId>spring-rabbitmq</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>spring-rabbitmq</name>
+    <name>RabbitMQ</name>
     <description>Rabbit MQ With Spring Boot</description>
 
     <properties>
