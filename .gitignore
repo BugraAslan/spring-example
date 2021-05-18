@@ -1,0 +1,4 @@
+# Project exclude paths
+/spring-datajpa-postgre/target/
+/spring-elasticsearch/target/
+/spring-mongo-rest/target/
