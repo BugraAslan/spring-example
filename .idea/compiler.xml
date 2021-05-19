@@ -11,6 +11,7 @@
         <module name="spring-elasticsearch" />
         <module name="spring-datajpa-postgre" />
         <module name="spring-rabbitmq" />
+        <module name="spring-graphql" />
       </profile>
     </annotationProcessing>
   </component>
@@ -18,6 +19,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="spring-datajpa-postgre" options="-parameters" />
       <module name="spring-elasticsearch" options="-parameters" />
+      <module name="spring-graphql" options="-parameters" />
       <module name="spring-mongo-rest" options="-parameters" />
       <module name="spring-rabbitmq" options="-parameters" />
     </option>
