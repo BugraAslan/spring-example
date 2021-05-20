@@ -13,6 +13,7 @@
         <module>spring-elasticsearch</module>
         <module>spring-datajpa-postgre</module>
         <module>spring-graphql</module>
+        <module>spring-redis</module>
     </modules>
 
     <properties>

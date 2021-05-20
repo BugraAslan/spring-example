@@ -12,6 +12,7 @@
         <module name="spring-datajpa-postgre" />
         <module name="spring-rabbitmq" />
         <module name="spring-graphql" />
+        <module name="spring-redis" />
       </profile>
     </annotationProcessing>
   </component>
@@ -22,6 +23,7 @@
       <module name="spring-graphql" options="-parameters" />
       <module name="spring-mongo-rest" options="-parameters" />
       <module name="spring-rabbitmq" options="-parameters" />
+      <module name="spring-redis" options="-parameters" />
     </option>
   </component>
 </project>
