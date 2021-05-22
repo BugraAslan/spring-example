@@ -1,7 +1,7 @@
 package com.learning.Service;
 
-import Entity.Order;
-import Entity.Product;
+import com.learning.Entity.Order;
+import com.learning.Entity.Product;
 import com.learning.Repository.OrderRepository;
 import com.learning.Repository.ProductRepository;
 import com.learning.Request.PostProductRequest;

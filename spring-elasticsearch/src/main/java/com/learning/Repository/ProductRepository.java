@@ -1,6 +1,6 @@
 package com.learning.Repository;
 
-import Entity.Product;
+import com.learning.Entity.Product;
 import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Repository;

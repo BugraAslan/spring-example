@@ -1,0 +1,78 @@
+<html>
+<head>
+    <title>Chat WebSocket</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
+    <script type="text/javascript">
+        let stompClient = null;
+        let baseAddress = 'http://localhost:8082';
+
+        function setConnected(connected) {
+            document.getElementById('connect').disabled = connected;
+            document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
+            document.getElementById('response').innerHTML = '';
+        }
+
+        function connect() {
+            stompClient = Stomp.over(new SockJS(baseAddress + '/chat'));
+            stompClient.connect({}, function(frame) {
+                setConnected(true);
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic', function (message) {
+                    handleReceivedMessage(message.body);
+                });
+            });
+        }
+
+        function disconnect() {
+            if(stompClient != null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
+
+        function sendMessage() {
+            stompClient.send("/chat", {},
+                JSON.stringify(
+                    {
+                        'sender': document.getElementById('sender').value,
+                        'text': document.getElementById('text').value
+                    }
+                )
+            );
+        }
+
+        function handleReceivedMessage(message) {
+            message = JSON.parse(message);
+            if (message.hasOwnProperty('sender') && message.hasOwnProperty('text')) {
+                let p = document.createElement('p');
+                p.style.wordWrap = 'break-word';
+                p.appendChild(document.createTextNode(message.sender + ": " + message.text));
+                document.getElementById('response').appendChild(p);
+            }
+
+        }
+    </script>
+</head>
+<body onload="disconnect()">
+<div>
+    <div>
+        <input id="sender" placeholder="username"/>
+    </div>
+    <br />
+    <div>
+        <button id="connect" onclick="connect();">Connect</button>
+        <button id="disconnect" disabled="disabled" onclick="disconnect();">Exit</button>
+    </div>
+    <br />
+    <div id="conversationDiv">
+        <input id="text" placeholder="Message.."/>
+        <button id="sendMessage" onclick="sendMessage();">Send</button>
+        <p id="response"></p>
+    </div>
+</div>
+
+</body>
+</html>

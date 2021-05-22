@@ -1,4 +1,4 @@
-package Entity;
+package com.learning.Entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,24 +7,25 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.ArrayList;
 import java.util.Date;
 
-@Document(indexName = "products")
+@Document(indexName = "orders")
 @Getter
 @Setter
-public class Product {
+public class Order {
 
     @Id
     private int id;
 
-    @Field(name = "name", type = FieldType.Text)
-    private String name;
+    @Field(name = "products", type = FieldType.Nested)
+    private ArrayList<Product> products;
 
-    @Field(name = "price", type = FieldType.Double)
-    private double price;
+    @Field(name = "totalPrice", type = FieldType.Double)
+    private double totalPrice;
 
-    @Field(name = "amount", type = FieldType.Double)
-    private double amount;
+    @Field(name = "totalAmount", type = FieldType.Double)
+    private double totalAmount;
 
     @Field(name = "createdAt", type = FieldType.Date)
     private Date createdAt;

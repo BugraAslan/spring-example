@@ -1,7 +1,7 @@
 package com.learning.Controller;
 
-import Entity.Order;
-import Entity.Product;
+import com.learning.Entity.Order;
+import com.learning.Entity.Product;
 import com.learning.Request.PostProductRequest;
 import com.learning.Service.CustomerService;
 import org.springframework.web.bind.annotation.*;
