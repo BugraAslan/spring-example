@@ -15,5 +15,5 @@ public class BaseResponseModel {
     private boolean success;
     private List<Object> data;
     private String error;
-    private HttpStatus statusCode;
+    private int statusCode;
 }

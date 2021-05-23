@@ -14,7 +14,7 @@ public class Response {
                 true,
                 data,
                 null,
-                HttpStatus.OK
+                HttpStatus.OK.value()
         );
     }
 
@@ -26,7 +26,7 @@ public class Response {
                 true,
                 objects,
                 null,
-                HttpStatus.OK
+                HttpStatus.OK.value()
         );
     }
 
@@ -35,7 +35,7 @@ public class Response {
                 false,
                 null,
                 error,
-                HttpStatus.NOT_ACCEPTABLE
+                HttpStatus.NOT_ACCEPTABLE.value()
         );
     }
 
@@ -44,7 +44,7 @@ public class Response {
                 false,
                 null,
                 error,
-                httpStatus
+                httpStatus.value()
         );
     }
 
@@ -53,7 +53,7 @@ public class Response {
                 false,
                 null,
                 String.join(" | ", errors),
-                httpStatus
+                httpStatus.value()
         );
     }
 }
