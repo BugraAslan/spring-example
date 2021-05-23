@@ -30,6 +30,15 @@ public class Response {
         );
     }
 
+    public BaseResponseModel successResponse() {
+        return new BaseResponseModel(
+                true,
+                new ArrayList<>(),
+                null,
+                HttpStatus.OK.value()
+        );
+    }
+
     public BaseResponseModel notAcceptableResponse(String error) {
         return new BaseResponseModel(
                 false,

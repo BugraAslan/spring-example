@@ -2,8 +2,10 @@ package com.learning.Controller;
 
 import com.learning.Aggregator.UserAggregator;
 import com.learning.DTO.DTOInterface;
+import com.learning.DTO.PaginationDTO;
 import com.learning.DTO.UserDTO;
 import com.learning.Manager.Response.UserResponseManager;
+import com.learning.Model.Request.PaginationRequest;
 import com.learning.Model.Request.UserRequest;
 import com.learning.Model.Response.BaseResponseModel;
 import com.learning.Model.Response.Response;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -52,9 +55,10 @@ public class UserController {
 
     @PostMapping()
     public BaseResponseModel createUser(@RequestBody UserRequest userRequest) {
+        System.out.println(userRequest.getAddress());
         DTOInterface user = userService.create(userAggregator.prepareDTOByRequest(userRequest));
         if (user == null) {
-            return response.notAcceptableResponse("Kullanıcı Güncellenemedi");
+            return response.notAcceptableResponse("Kullanıcı Eklenemedi");
         }
 
         return response.successResponse(
@@ -70,5 +74,23 @@ public class UserController {
         );
 
         return response.successResponse(userResponseList);
+    }
+
+    @GetMapping("/list/pagination")
+    public BaseResponseModel getAllUserWithPagination(@RequestBody PaginationRequest paginationRequest) {
+        try {
+            Map<String, List<DTOInterface>> userList = userService.getAllWithPagination(paginationRequest);
+            List<Object> userResponseList = new ArrayList<>();
+            userList.get("data").forEach(
+                    userDto -> userResponseList.add(userResponseManager.buildUserResponse((UserDTO) userDto))
+            );
+            userResponseList.add(
+                    userResponseManager.buildPaginationResponse((PaginationDTO) userList.get("pagination").get(0))
+            );
+
+            return response.successResponse(userResponseList);
+        } catch (NullPointerException nullPointerException) {
+            return response.successResponse();
+        }
     }
 }

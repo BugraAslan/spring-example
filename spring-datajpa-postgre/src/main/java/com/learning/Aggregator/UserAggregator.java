@@ -1,18 +1,20 @@
 package com.learning.Aggregator;
 
 import com.learning.DTO.AddressDTO;
+import com.learning.DTO.PaginationDTO;
 import com.learning.DTO.UserDTO;
 import com.learning.Entity.Address;
 import com.learning.Entity.User;
 import com.learning.Model.Request.AddressRequest;
 import com.learning.Model.Request.UserRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class UserAggregator {
+public class UserAggregator extends PaginationAggregator {
 
     public UserDTO prepareDTOByRequest(UserRequest userRequest) {
         UserDTO userDTO = new UserDTO();
@@ -21,7 +23,7 @@ public class UserAggregator {
         userDTO.setStatus(userRequest.isStatus());
 
         List<AddressDTO> addressDTOList = new ArrayList<>();
-        if (userRequest.getAddress().size() > 0) {
+        if (userRequest.getAddress() != null) {
             for (AddressRequest addressRequest: userRequest.getAddress()) {
                 AddressDTO addressDTO = new AddressDTO();
                 addressDTO.setId(addressRequest.getId());
@@ -44,7 +46,7 @@ public class UserAggregator {
         userDTO.setStatus(user.isStatus());
 
         List<AddressDTO> addressDTOList = new ArrayList<>();
-        if (user.getAddresses().size() > 0) {
+        if (user.getAddresses() != null) {
             for (Address address: user.getAddresses()) {
                 AddressDTO addressDTO = new AddressDTO();
                 addressDTO.setId(address.getId());

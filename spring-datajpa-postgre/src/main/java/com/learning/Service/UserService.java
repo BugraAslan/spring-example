@@ -5,16 +5,17 @@ import com.learning.DTO.AddressDTO;
 import com.learning.DTO.DTOInterface;
 import com.learning.DTO.UserDTO;
 import com.learning.Entity.User;
+import com.learning.Model.Request.PaginationRequest;
 import com.learning.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,12 +57,16 @@ public class UserService implements CrudService {
 
             List<AddressDTO> addressDTOList = new ArrayList<>();
             userDTO.getAddress().forEach(item -> {
+                System.out.println("girdi");
                     item.setUserId(user.getId());
                     addressDTOList.add((AddressDTO)addressService.create(item));
                 }
             );
+
             userDTO.setId(user.getId());
-            userDTO.setAddress(addressDTOList);
+            if (addressDTOList.size() > 0) {
+                userDTO.setAddress(addressDTOList);
+            }
 
             return userDTO;
         } catch (Exception exception) {
@@ -78,6 +83,32 @@ public class UserService implements CrudService {
         return userDTOList;
     }
 
+    public Map<String, List<DTOInterface>> getAllWithPagination(PaginationRequest paginationRequest) {
+        Pageable pageable = PageRequest.of(
+                paginationRequest.getPage(),
+                paginationRequest.getSize(),
+                Sort.by("id").descending()
+        );
+
+        Page<User> userPage = userRepository.findAll(pageable);
+        if (!userPage.hasContent()) {
+            return null;
+        }
+
+        List<DTOInterface> userDTOList = new ArrayList<>();
+        List<DTOInterface> paginationDTOList = new ArrayList<>();
+        userPage.getContent().forEach(
+                item -> userDTOList.add(userAggregator.prepareDTOByEntity(item))
+        );
+
+        paginationDTOList.add(userAggregator.preparePaginationDTOByPage(userPage));
+        Map<String, List<DTOInterface>> responseMap = new HashMap<>();
+        responseMap.put("data", userDTOList);
+        responseMap.put("pagination", paginationDTOList);
+
+        return responseMap;
+    }
+
     @Override
     public void deleteById(Long id) {
         userRepository.deleteById(id);
@@ -91,10 +122,5 @@ public class UserService implements CrudService {
         }
 
         return userAggregator.prepareDTOByEntity(user.get());
-    }
-
-    @Override
-    public Page<DTOInterface> getAllWithPagination(Pageable pageable) {
-        return null;
     }
 }

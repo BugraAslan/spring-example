@@ -17,6 +17,4 @@ public interface CrudService {
     void deleteById(Long id);
 
     DTOInterface getById(Long id);
-
-    Page<DTOInterface> getAllWithPagination(Pageable pageable);
 }
