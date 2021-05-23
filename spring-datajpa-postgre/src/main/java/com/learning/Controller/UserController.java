@@ -77,6 +77,7 @@ public class UserController {
     }
 
     @GetMapping("/list/pagination")
+    // TODO change
     public BaseResponseModel getAllUserWithPagination(@RequestBody PaginationRequest paginationRequest) {
         try {
             Map<String, List<DTOInterface>> userList = userService.getAllWithPagination(paginationRequest);

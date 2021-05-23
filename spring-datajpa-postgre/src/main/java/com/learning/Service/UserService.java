@@ -83,6 +83,7 @@ public class UserService implements CrudService {
         return userDTOList;
     }
 
+    // TODO change
     public Map<String, List<DTOInterface>> getAllWithPagination(PaginationRequest paginationRequest) {
         Pageable pageable = PageRequest.of(
                 paginationRequest.getPage(),
