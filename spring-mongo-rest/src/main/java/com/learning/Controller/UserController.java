@@ -1,67 +1,70 @@
 package com.learning.Controller;
 
 import com.learning.Entity.User;
-import com.learning.Repository.UserRepository;
 import com.learning.Request.PostUserRequest;
+import com.learning.Service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping
-    public User create(@RequestBody PostUserRequest userRequest) {
-        try {
-            if (userRequest.getUsername().isEmpty()) {
-                return null;
-            } else {
-                User user = new User();
-                user.setUsername(userRequest.getUsername());
-                userRepository.save(user);
-                return user;
-            }
-        } catch (Exception exception) {
+    public ResponseEntity<Object> create(@RequestBody PostUserRequest userRequest) {
+        if (userRequest.getUsername().isEmpty()) {
             return null;
         }
+
+        User user = userService.createUser(userRequest);
+        if (user == null) {
+            return new ResponseEntity<>("User not created", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PatchMapping()
-    public Optional<User> update(@RequestBody PostUserRequest userRequest) {
-        try {
-            Optional<User> user = userRepository.findById(userRequest.getId());
-            if (user.isPresent()) {
-                user.get().setUsername(userRequest.getUsername());
-                userRepository.save(user.get());
-            }
-            return user;
-        } catch (Exception exception) {
-            return Optional.empty();
+    public ResponseEntity<Object> update(@RequestBody PostUserRequest userRequest) {
+        User user = userService.updateUser(userRequest);
+        if (user == null) {
+            return new ResponseEntity<>("Kullanıcı Bulunamadı", HttpStatus.BAD_REQUEST);
         }
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable String id) {
-        userRepository.deleteById(id);
-        return ResponseEntity.ok("User deleted");
+        boolean isDeleted = userService.deleteUser(id);
+        if (!isDeleted) {
+            return new ResponseEntity<>("User not deleted", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("User deleted", HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public Optional<User> getUserById(@PathVariable String id) {
-        return userRepository.findById(id);
+    public ResponseEntity<Object> getUserById(@PathVariable String id) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping("/list")
     public List<User> getUsers() {
-        return userRepository.findAll();
+        return userService.getAllUser();
     }
 }
