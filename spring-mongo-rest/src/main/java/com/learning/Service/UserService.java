@@ -1,12 +1,12 @@
 package com.learning.Service;
 
 import com.learning.Entity.User;
+import com.learning.Exception.UserNotFoundException;
 import com.learning.Repository.UserRepository;
 import com.learning.Request.PostUserRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -30,24 +30,24 @@ public class UserService {
     }
 
     public User updateUser(PostUserRequest userRequest) {
-        Optional<User> user = userRepository.findById(userRequest.getId());
-        if (user.isEmpty()) {
-            return null;
-        }
+        User user = userRepository.findById(userRequest.getId()).stream().
+                findFirst().orElseThrow(UserNotFoundException::new);
+        user.setUsername(userRequest.getUsername());
+        userRepository.save(user);
 
-        user.get().setUsername(userRequest.getUsername());
-        userRepository.save(user.get());
-
-        return user.get();
+        return user;
     }
 
     public boolean deleteUser(String id) {
-        if (userRepository.findById(id).isEmpty()) {
+        User user = userRepository.findById(id).stream().
+                findFirst().orElseThrow(UserNotFoundException::new);
+
+        try {
+            userRepository.deleteById(user.getId());
+            return true;
+        } catch (Exception e) {
             return false;
         }
-        userRepository.deleteById(id);
-
-        return true;
     }
 
     public List<User> getAllUser() {
@@ -55,11 +55,6 @@ public class UserService {
     }
 
     public User getUserById(String id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            return null;
-        }
-
-        return user.get();
+        return userRepository.findById(id).stream().findFirst().orElseThrow(UserNotFoundException::new);
     }
 }

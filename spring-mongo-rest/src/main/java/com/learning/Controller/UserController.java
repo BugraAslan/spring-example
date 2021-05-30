@@ -35,12 +35,7 @@ public class UserController {
 
     @PatchMapping()
     public ResponseEntity<Object> update(@RequestBody PostUserRequest userRequest) {
-        User user = userService.updateUser(userRequest);
-        if (user == null) {
-            return new ResponseEntity<>("Kullanıcı Bulunamadı", HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userService.updateUser(userRequest), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -55,12 +50,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getUserById(@PathVariable String id) {
-        User user = userService.getUserById(id);
-        if (user == null) {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
     @GetMapping("/list")
