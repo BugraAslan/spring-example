@@ -14,6 +14,8 @@ public class AddressAggregator {
         AddressDTO.setType(address.getType());
         AddressDTO.setStatus(address.isStatus());
         AddressDTO.setUserId(address.getUser().getId());
+        AddressDTO.setCityId(address.getCity().getId());
+        AddressDTO.setCountryId(address.getCountry().getId());
 
         return AddressDTO;
     }

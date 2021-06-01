@@ -4,6 +4,7 @@ import com.learning.Aggregator.UserAggregator;
 import com.learning.DTO.DTOInterface;
 import com.learning.DTO.PaginationDTO;
 import com.learning.DTO.UserDTO;
+import com.learning.Exception.RecordNotFoundException;
 import com.learning.Manager.Response.UserResponseManager;
 import com.learning.Model.Request.PaginationRequest;
 import com.learning.Model.Request.UserRequest;
@@ -12,7 +13,6 @@ import com.learning.Model.Response.Response;
 import com.learning.Model.Response.UserResponse;
 import com.learning.Service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,38 +31,32 @@ public class UserController {
 
     @GetMapping("/{id}")
     public BaseResponseModel getUserById(@PathVariable Long id) {
-        DTOInterface user = userService.getById(id);
-        if (user == null) {
-            return response.customErrorResponse("Kullanıcı Bulunamadı", HttpStatus.NOT_FOUND);
-        }
-
         return response.successResponse(
-                userResponseManager.buildUserResponse((UserDTO) user)
+                userResponseManager.buildUserResponse((UserDTO) userService.getById(id))
         );
     }
 
     @PatchMapping()
     public BaseResponseModel updateUser(@RequestBody UserRequest userRequest) {
-        DTOInterface user = userService.update(userAggregator.prepareDTOByRequest(userRequest));
-        if (user == null) {
-            return response.notAcceptableResponse("Kullanıcı Güncellenemedi");
-        }
-
         return response.successResponse(
-                userResponseManager.buildUserResponse((UserDTO) user)
+                userResponseManager.buildUserResponse(
+                        (UserDTO) userService.update(userAggregator.prepareDTOByRequest(userRequest))
+                )
         );
+    }
+
+    @DeleteMapping("/{id}")
+    public BaseResponseModel deleteUser(@PathVariable Long id) {
+        userService.deleteById(id);
+        return response.successResponse("Deleted");
     }
 
     @PostMapping()
     public BaseResponseModel createUser(@RequestBody UserRequest userRequest) {
-        System.out.println(userRequest.getAddress());
-        DTOInterface user = userService.create(userAggregator.prepareDTOByRequest(userRequest));
-        if (user == null) {
-            return response.notAcceptableResponse("Kullanıcı Eklenemedi");
-        }
-
         return response.successResponse(
-                userResponseManager.buildUserResponse((UserDTO) user)
+                userResponseManager.buildUserResponse(
+                        (UserDTO) userService.create(userAggregator.prepareDTOByRequest(userRequest))
+                )
         );
     }
 
@@ -72,6 +66,10 @@ public class UserController {
         userService.getAll().forEach(
                 userDto -> userResponseList.add(userResponseManager.buildUserResponse((UserDTO) userDto))
         );
+
+        if (userResponseList.isEmpty()) {
+            throw new RecordNotFoundException("User not found");
+        }
 
         return response.successResponse(userResponseList);
     }
@@ -86,7 +84,9 @@ public class UserController {
                     userDto -> userResponseList.add(userResponseManager.buildUserResponse((UserDTO) userDto))
             );
             userResponseList.add(
-                    userResponseManager.buildPaginationResponse((PaginationDTO) userList.get("pagination").get(0))
+                    userResponseManager.buildPaginationResponse(
+                            (PaginationDTO) userList.get("pagination").get(0)
+                    )
             );
 
             return response.successResponse(userResponseList);

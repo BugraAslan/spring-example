@@ -4,48 +4,56 @@ import com.learning.Aggregator.AddressAggregator;
 import com.learning.DTO.AddressDTO;
 import com.learning.DTO.DTOInterface;
 import com.learning.Entity.Address;
+import com.learning.Exception.RecordNotFoundException;
 import com.learning.Repository.AddressRepository;
+import com.learning.Repository.CityRepository;
+import com.learning.Repository.CountryRepository;
 import com.learning.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AddressService implements CrudService{
+public class AddressService implements CrudService {
 
+    private final AddressAggregator addressAggregator;
     private final AddressRepository addressRepository;
     private final UserRepository userRepository;
-    private final AddressAggregator addressAggregator;
+    private final CountryRepository countryRepository;
+    private final CityRepository cityRepository;
 
     @Override
+    @Transactional
     public DTOInterface update(DTOInterface dtoInterface) {
         AddressDTO addressDTO = (AddressDTO) dtoInterface;
-        Optional<Address> address = addressRepository.findById(addressDTO.getId());
-        if (address.isEmpty()) {
-            return null;
-        }
+        Address address = addressRepository.findById(addressDTO.getId()).stream().findFirst()
+                .orElseThrow(() -> new RecordNotFoundException("Address not found"));
 
-        address.get().setAddress(addressDTO.getAddress());
-        address.get().setStatus(addressDTO.isStatus());
-        address.get().setType(addressDTO.getType());
-        addressRepository.save(address.get());
+        address.setAddress(addressDTO.getAddress());
+        address.setStatus(addressDTO.isStatus());
+        address.setType(addressDTO.getType());
+        cityRepository.findById(addressDTO.getCityId()).ifPresent(address::setCity);
+        countryRepository.findById(addressDTO.getCountryId()).ifPresent(address::setCountry);
+        addressRepository.save(address);
 
-        return addressAggregator.prepareDTOByEntity(address.get());
+        return addressAggregator.prepareDTOByEntity(address);
     }
 
     @Override
+    @Transactional
     public DTOInterface create(DTOInterface dtoInterface) {
         AddressDTO addressDTO = (AddressDTO) dtoInterface;
-
         Address addressEntity = new Address();
         addressEntity.setAddress(addressDTO.getAddress());
         addressEntity.setStatus(addressDTO.isStatus());
         addressEntity.setType(addressDTO.getType());
-        addressEntity.setUser(userRepository.findById(addressDTO.getUserId()).get());
+        userRepository.findById(addressDTO.getUserId()).ifPresent(addressEntity::setUser);
+        cityRepository.findById(addressDTO.getCityId()).ifPresent(addressEntity::setCity);
+        countryRepository.findById(addressDTO.getCountryId()).ifPresent(addressEntity::setCountry);
         addressRepository.save(addressEntity);
 
         return addressAggregator.prepareDTOByEntity(addressEntity);
@@ -55,6 +63,7 @@ public class AddressService implements CrudService{
     public List<DTOInterface> getAll() {
         List<DTOInterface> addressDTOList = new ArrayList<>();
         addressRepository.findAll().forEach(value -> addressDTOList.add(addressAggregator.prepareDTOByEntity(value)));
+
         return addressDTOList;
     }
 
@@ -65,11 +74,9 @@ public class AddressService implements CrudService{
 
     @Override
     public DTOInterface getById(Long id) {
-        Optional<Address> addressEntity = addressRepository.findById(id);
-        if (addressEntity.isEmpty()) {
-            return null;
-        }
-
-        return addressAggregator.prepareDTOByEntity(addressEntity.get());
+        return addressAggregator.prepareDTOByEntity(
+                addressRepository.findById(id).stream().findFirst()
+                        .orElseThrow(() -> new RecordNotFoundException("Address not found"))
+        );
     }
 }

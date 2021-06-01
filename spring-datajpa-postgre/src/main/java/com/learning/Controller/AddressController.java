@@ -1,7 +1,7 @@
 package com.learning.Controller;
 
 import com.learning.DTO.AddressDTO;
-import com.learning.DTO.DTOInterface;
+import com.learning.Exception.RecordNotFoundException;
 import com.learning.Manager.Response.AddressResponseManager;
 import com.learning.Model.Response.AddressResponse;
 import com.learning.Model.Response.BaseResponseModel;
@@ -25,13 +25,10 @@ public class AddressController extends BaseController{
 
     @GetMapping("/{id}")
     public BaseResponseModel getById(@PathVariable Long id) {
-        DTOInterface addressDTO = addressService.getById(id);
-        if (addressDTO == null) {
-            return response.notAcceptableResponse("Adres Bulunamadı");
-        }
-
         return response.successResponse(
-                addressResponseManager.buildAddressResponse((AddressDTO) addressDTO)
+                addressResponseManager.buildAddressResponse(
+                        (AddressDTO) addressService.getById(id)
+                )
         );
     }
 
@@ -39,11 +36,13 @@ public class AddressController extends BaseController{
     public BaseResponseModel getAllAddress() {
         List<AddressResponse> addressResponseList = new ArrayList<>();
         addressService.getAll().forEach(item ->
-                addressResponseList.add(addressResponseManager.buildAddressResponse((AddressDTO) item))
+                addressResponseList.add(
+                        addressResponseManager.buildAddressResponse((AddressDTO) item)
+                )
         );
 
         if (addressResponseList.isEmpty()) {
-            return response.notAcceptableResponse("Adres Bulunamadı");
+            throw new RecordNotFoundException("Address not found");
         }
 
         return response.successResponse(addressResponseList);

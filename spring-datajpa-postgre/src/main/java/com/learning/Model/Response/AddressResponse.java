@@ -13,4 +13,6 @@ public class AddressResponse {
     private AddressType type;
     private boolean status;
     private Long userId;
+    private Long cityId;
+    private Long countryId;
 }

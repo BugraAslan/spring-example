@@ -13,4 +13,6 @@ public class AddressDTO implements DTOInterface {
     private boolean status;
     private AddressType type;
     private Long userId;
+    private Long cityId;
+    private Long countryId;
 }

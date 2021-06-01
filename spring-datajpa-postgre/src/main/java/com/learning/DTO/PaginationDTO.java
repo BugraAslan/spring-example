@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PaginationDTO implements DTOInterface{
+public class PaginationDTO implements DTOInterface {
     private int page;
     private int size;
     private int totalPage;

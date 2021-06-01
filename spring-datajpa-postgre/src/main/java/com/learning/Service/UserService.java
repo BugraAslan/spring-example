@@ -5,6 +5,7 @@ import com.learning.DTO.AddressDTO;
 import com.learning.DTO.DTOInterface;
 import com.learning.DTO.UserDTO;
 import com.learning.Entity.User;
+import com.learning.Exception.RecordNotFoundException;
 import com.learning.Model.Request.PaginationRequest;
 import com.learning.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,34 +16,36 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class UserService implements CrudService {
 
-    private final UserRepository userRepository;
     private final UserAggregator userAggregator;
     private final AddressService addressService;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
     public DTOInterface update(DTOInterface dtoInterface) {
-        try {
             UserDTO userDTO = (UserDTO) dtoInterface;
-            Optional<User> user = userRepository.findById(userDTO.getId());
-            if (user.isPresent()) {
-                user.get().setUsername(userDTO.getUsername());
-                user.get().setStatus(userDTO.isStatus());
-                userDTO.getAddress().forEach(addressService::update);
-                userRepository.save(user.get());
-                return userAggregator.prepareDTOByEntity(user.get());
-            }
-            return null;
-        } catch (Exception exception) {
-            System.out.println(exception.getMessage());
-            return null;
-        }
+            User user = userRepository.findById(userDTO.getId()).stream().findFirst()
+                    .orElseThrow(() -> new RecordNotFoundException("User not found"));
+
+            user
+                    .setFirstName(userDTO.getFirstName())
+                    .setLastName(userDTO.getLastName())
+                    .setEmail(userDTO.getEmail())
+                    .setPhoneNumber(userDTO.getPhoneNumber())
+                    .setStatus(userDTO.isStatus());
+            userDTO.getAddress().forEach(addressService::update);
+            userRepository.save(user);
+
+            return userAggregator.prepareDTOByEntity(user);
     }
 
     @Override
@@ -50,16 +53,18 @@ public class UserService implements CrudService {
     public DTOInterface create(DTOInterface dtoInterface) {
         try {
             UserDTO userDTO = (UserDTO) dtoInterface;
-            User user = new User();
-            user.setUsername(userDTO.getUsername());
-            user.setStatus(userDTO.isStatus());
+            User user = (new User())
+                    .setFirstName(userDTO.getFirstName())
+                    .setLastName(userDTO.getLastName())
+                    .setEmail(userDTO.getEmail())
+                    .setPhoneNumber(userDTO.getPhoneNumber())
+                    .setStatus(userDTO.isStatus());
             userRepository.save(user);
 
             List<AddressDTO> addressDTOList = new ArrayList<>();
-            userDTO.getAddress().forEach(item -> {
-                System.out.println("girdi");
+            userDTO.getAddress().forEach(item ->  {
                     item.setUserId(user.getId());
-                    addressDTOList.add((AddressDTO)addressService.create(item));
+                    addressDTOList.add((AddressDTO) addressService.create(item));
                 }
             );
 
@@ -112,16 +117,17 @@ public class UserService implements CrudService {
 
     @Override
     public void deleteById(Long id) {
-        userRepository.deleteById(id);
+        userRepository.delete(
+                userRepository.findById(id).stream().findFirst()
+                        .orElseThrow(() -> new RecordNotFoundException("User not found"))
+        );
     }
 
     @Override
     public DTOInterface getById(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
-            return null;
-        }
-
-        return userAggregator.prepareDTOByEntity(user.get());
+        return userAggregator.prepareDTOByEntity(
+                userRepository.findById(id).stream().findFirst()
+                        .orElseThrow(() -> new RecordNotFoundException("User not found"))
+        );
     }
 }

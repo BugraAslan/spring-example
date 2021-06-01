@@ -9,9 +9,13 @@ public class UserResponseManager extends PaginationResponseManager implements Re
 
     public UserResponse buildUserResponse(UserDTO userDTO) {
         UserResponse userResponse = new UserResponse();
-        userResponse.setUsername(userDTO.getUsername());
         userResponse.setId(userDTO.getId());
+        userResponse.setFirstName(userDTO.getFirstName());
+        userResponse.setLastName(userDTO.getLastName());
+        userResponse.setEmail(userDTO.getEmail());
         userResponse.setStatus(userDTO.isStatus());
+        userResponse.setPhoneNumber(userDTO.getPhoneNumber());
+
         if (userDTO.getAddress() != null) {
             userResponse.setAddress(userDTO.getAddress());
         }

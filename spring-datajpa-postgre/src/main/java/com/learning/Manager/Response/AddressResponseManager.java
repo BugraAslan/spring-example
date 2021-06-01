@@ -14,6 +14,8 @@ public class AddressResponseManager implements ResponseManager {
         addressResponse.setType(addressDTO.getType());
         addressResponse.setStatus(addressDTO.isStatus());
         addressResponse.setUserId(addressDTO.getUserId());
+        addressResponse.setCityId(addressDTO.getCityId());
+        addressResponse.setCountryId(addressDTO.getCountryId());
 
         return addressResponse;
     }

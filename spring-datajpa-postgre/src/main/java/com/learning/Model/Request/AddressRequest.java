@@ -8,8 +8,11 @@ import lombok.Setter;
 @Setter
 public class AddressRequest {
 
-    public Long id;
-    public String address;
-    public boolean status;
-    public AddressType type;
+    private Long id;
+    private String address;
+    private boolean status;
+    private AddressType type;
+    private Long cityId;
+    private Long countryId;
+
 }
